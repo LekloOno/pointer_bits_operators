@@ -1,46 +1,43 @@
 pub trait PtrBitsOps {
-    fn add_bit_offset(self, offset: u32) -> *const u8;
-    fn sub_bit_offset(self, offset: u32) -> *const u8;
-    fn mut_add_bit_offset(self, offset: u32) -> *mut u8;
-    fn mut_sub_bit_offset(self, offset: u32) -> *mut u8;
+    fn add_bits_offset(self, offset: u32) -> *const u8;
+    fn sub_bits_offset(self, offset: u32) -> *const u8;
+    fn bits_align(align: u32) -> *const u8;
+}
+
+pub trait MutPtrBitsOps {
+    fn add_bits_offset(self, offset: u32) -> *mut u8;
+    fn sub_bits_offset(self, offset: u32) -> *mut u8;
+    fn bits_align(align: u32) -> *mut u8;
 }
 
 macro_rules! prim_impl {
     ($($t:tt)*) => {
         $(
             impl PtrBitsOps for *const $t {
-                fn add_bit_offset(self, offset: u32) -> *const u8 {
+                fn add_bits_offset(self, offset: u32) -> *const u8 {
                     (self as u32 + offset) as *const u8
                 }
             
-                fn sub_bit_offset(self, offset: u32) -> *const u8 {
+                fn sub_bits_offset(self, offset: u32) -> *const u8 {
                     (self as u32 - offset) as *const u8
                 }
 
-                fn mut_add_bit_offset(self, offset: u32) -> *mut u8 {
-                    (self as u32 + offset) as *mut u8
-                }
-            
-                fn mut_sub_bit_offset(self, offset: u32) -> *mut u8 {
-                    (self as u32 - offset) as *mut u8
+                fn bits_align(align: u32) -> *const u8 {
+                    ((self as u32 + align) & !(align -1)) as *const u8
                 }
             }
 
-            impl PtrBitsOps for *mut $t {
-                fn add_bit_offset(self, offset: u32) -> *const u8 {
-                    (self as u32 + offset) as *const u8
-                }
-            
-                fn sub_bit_offset(self, offset: u32) -> *const u8 {
-                    (self as u32 - offset) as *const u8
-                }
-
-                fn mut_add_bit_offset(self, offset: u32) -> *mut u8 {
+            impl MutPtrBitsOps for *mut $t {
+                fn mut_add_bits_offset(self, offset: u32) -> *mut u8 {
                     (self as u32 + offset) as *mut u8
                 }
             
-                fn mut_sub_bit_offset(self, offset: u32) -> *mut u8 {
+                fn mut_sub_bits_offset(self, offset: u32) -> *mut u8 {
                     (self as u32 - offset) as *mut u8
+                }
+
+                fn bits_align(align: u32) -> *mut u8 {
+                    ((self as u32 + align) & !(align -1)) as *mut u8
                 }
             }
         )*

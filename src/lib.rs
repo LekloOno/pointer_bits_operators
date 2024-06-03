@@ -1,3 +1,5 @@
+#![no_std]
+
 pub trait PtrBitsOps {
     fn add_bits_offset(self, offset: u32) -> *const u8;
     fn sub_bits_offset(self, offset: u32) -> *const u8;
